@@ -5,7 +5,6 @@ const app = express();
 const PORT = 8081;
 app.use(express.json());
 
-
 app.get("/", (req, res) => {
 	res.status(200).json({ message: "Server is running" });
 });
@@ -16,6 +15,7 @@ app.get("*", (req, res) => {
 	});
 });
 
+//get a user
 app.get("/users", (req, res) => {
 	res.status(200).json({
 		success: true,
@@ -23,6 +23,7 @@ app.get("/users", (req, res) => {
 	});
 });
 
+//get user by id
 app.get("/users/:id", (req, res) => {
 	const { id } = req.params;
 	const user = users.find((each) => each.id === id);
@@ -57,6 +58,55 @@ app.post("/", (req, res) => {
 	});
 });
 
+//update a user
+app.put("/users/:id", (req, res) => {
+	const { id } = req.params;
+	const { data } = req.body;
+
+	const user = users.find((each) => each.id === id);
+
+	if (!user) {
+		res.status(404).json({
+			success: false,
+			message: "user not found",
+		});
+	}
+
+	const updatedUser = users.map((each) => {
+		if (each.id === id) {
+			return {
+				...each,
+				...data,
+			};
+		}
+		return each;
+	});
+
+	return res.status(200).json({
+		success: true,
+		data: updatedUser,
+	});
+});
+
+//delete a user
+
+app.delete("/users/:id", (req, res) => {
+	const { id } = req.params;
+	const user = users.find((each) => each.id === id);
+
+	if (!user) {
+		return res.status(404).json({
+			success: false,
+			message: "user not found",
+		});
+	}
+	const index = users.indexOf(user);
+	users.splice(index, 1);
+	return res.status(202).json({
+		success: true,
+		data: users,
+	});
+});
 app.listen(PORT, () => {
 	console.log("Server is runnig at port", PORT);
 });
